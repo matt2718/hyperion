@@ -161,7 +161,7 @@ sshRunCmd addr sshCmd (cmd, args) = retryRepeated 10 (try @IO @SSHError) $ do
   where
     (ssh, sshOpts) = fromMaybe defaultCmd sshCmd
     sshArgs = sshOpts ++ [ addr
-                         , shellEsc "sh"
+                         , envSetup ++ shellEsc "sh"
                            [ "-c"
                            , shellEsc "nohup" (cmd : args)
                              ++ " &"
@@ -169,3 +169,4 @@ sshRunCmd addr sshCmd (cmd, args) = retryRepeated 10 (try @IO @SSHError) $ do
                          ]
     -- update SSHCommand haddock if changing this default.
     defaultCmd = ("ssh", ["-f", "-o", "UserKnownHostsFile /dev/null"]) 
+    envSetup = "[[ -f $HOME/.hyperion ]] && source $HOME/.hyperion ; "
